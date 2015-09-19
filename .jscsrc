@@ -1,0 +1,4 @@
+{
+  "disallowSemicolons": true,
+  "excludeFiles": ["app/!(models)**"]
+}
