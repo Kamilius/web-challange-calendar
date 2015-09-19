@@ -4,6 +4,3 @@ platforms
 # scss
 .gulp-scss-cache
 .sass-cache
-
-# compiled files
-build
