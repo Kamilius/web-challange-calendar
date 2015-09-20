@@ -43,6 +43,9 @@ var Calendar = (function () {
     this.bootstrapEvents();
   }
 
+  // Testing part. Contains calendar initialization and calendar testing form
+  // handler
+
   /**
    * Generate selected month visible dates
    * @function buildCurrentMonthDays
@@ -189,6 +192,31 @@ var Calendar = (function () {
     }
 
     /**
+     * Update calendar options
+     * @function update
+     * @param {string} [option='selectedDate'|'activeDateClass'] - name of option to be updated
+     * @param {string} value - value of option to be updated
+     */
+  }, {
+    key: 'update',
+    value: function update(option, value) {
+      if (option === 'selectedDate') {
+        var date = new Date(value);
+
+        if (!isNaN(date.getTime())) {
+          this.selectedDate = new Date(value);
+          this.currentMonth = this.selectedDate;
+        } else {
+          throw new Error('Invalid date format');
+        }
+      } else if (option === 'activeDateClass') {
+        this.activeDateClass = value;
+      }
+
+      this.refreshCalendar();
+    }
+
+    /**
      * Select day. Used as event handler for day-list__item 'click'
      * @function selectDay
      * @prop {Object} event - represents 'click' event object
@@ -276,3 +304,19 @@ var Calendar = (function () {
 
   return Calendar;
 })();
+
+var calendar = new Calendar({
+  container: '.calendar'
+});
+
+function changeCalendarOptions(event) {
+  event.preventDefault();
+
+  var classValue = document.getElementById('class-input').value;
+  var dateValue = document.getElementById('date-input').value;
+
+  classValue.trim() && calendar.update('activeDateClass', classValue);
+  dateValue.trim() && calendar.update('selectedDate', dateValue);
+}
+
+document.querySelector('.calendar-form').addEventListener('submit', changeCalendarOptions);

@@ -7,11 +7,22 @@
   </head>
   <body>
     <div class="calendar"></div>
+
+    <!-- Testing form START -->
+    <form class="calendar-form">
+      <div class="control-group">
+        <label class="control-label" for="class-input">Class: </label>
+        <input class="control-input" type="text" id="class-input" placeholder="Type class name here..."/>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="date-input">Selected date: </label>
+        <input class="control-input" type="date" id="date-input" placeholder="Type date in format M/D/YYYY..."/>
+      </div>
+      <div class="control-group">
+        <button type="submit">Change</button>
+      </div>
+    </div>
+    <!-- Testing form END -->
     <script src="calendar.js" charset="utf-8"></script>
-    <script type="text/javascript">
-      var calendar = new Calendar({
-        container: '.calendar'
-      })
-    </script>
   </body>
 </html>

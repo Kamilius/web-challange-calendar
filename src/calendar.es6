@@ -155,6 +155,28 @@ class Calendar {
     this.refreshCalendar();
   }
   /**
+   * Update calendar options
+   * @function update
+   * @param {string} [option='selectedDate'|'activeDateClass'] - name of option to be updated
+   * @param {string} value - value of option to be updated
+   */
+  update(option, value) {
+    if (option === 'selectedDate') {
+      let date = new Date(value)
+
+      if (!isNaN(date.getTime())) {
+        this.selectedDate = new Date(value)
+        this.currentMonth = this.selectedDate
+      } else {
+        throw new Error('Invalid date format')
+      }
+    } else if (option === 'activeDateClass') {
+      this.activeDateClass = value
+    }
+
+    this.refreshCalendar()
+  }
+  /**
    * Select day. Used as event handler for day-list__item 'click'
    * @function selectDay
    * @prop {Object} event - represents 'click' event object
@@ -254,3 +276,22 @@ class Calendar {
                 .addEventListener('click', this.selectDay.bind(this));
   }
 }
+
+// Testing part. Contains calendar initialization and calendar testing form
+// handler
+var calendar = new Calendar({
+  container: '.calendar'
+});
+
+function changeCalendarOptions(event) {
+  event.preventDefault();
+
+  var classValue = document.getElementById('class-input').value;
+  var dateValue = document.getElementById('date-input').value;
+
+  classValue.trim() && calendar.update('activeDateClass', classValue);
+  dateValue.trim() && calendar.update('selectedDate', dateValue);
+}
+
+document.querySelector('.calendar-form')
+        .addEventListener('submit', changeCalendarOptions);

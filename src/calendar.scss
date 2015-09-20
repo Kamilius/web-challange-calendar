@@ -1,5 +1,6 @@
 $white: #fff;
 $gray: gray;
+$red: red;
 $btn-bg-color: #4889ff;
 $btn-hover-bg-color: #83AFFF;
 $main-color: #2f4f4f;
@@ -87,6 +88,26 @@ $main-color: #2f4f4f;
         background-color: $white;
       }
 
-.custom-class {
-  background-color: red;
+/* testing styles */
+.red-class {
+  background-color: $red;
 }
+.gray-class {
+  background-color: $gray;
+}
+.calendar-form {
+  width: 300px;
+  padding: 10px;
+  border: 1px solid $gray;
+}
+  .control-group + .control-group {
+    margin-top: 5px;
+  }
+  .control-label {
+    display: inline-block;
+    width: 94px;
+    font-size: 14px;
+  }
+  .control-input {
+    width: 197px;
+  }

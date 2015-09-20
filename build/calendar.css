@@ -77,5 +77,25 @@
   border: 1px solid #4889ff;
   background-color: #fff; }
 
-.custom-class {
+/* testing styles */
+.red-class {
   background-color: red; }
+
+.gray-class {
+  background-color: gray; }
+
+.calendar-form {
+  width: 300px;
+  padding: 10px;
+  border: 1px solid gray; }
+
+.control-group + .control-group {
+  margin-top: 5px; }
+
+.control-label {
+  display: inline-block;
+  width: 94px;
+  font-size: 14px; }
+
+.control-input {
+  width: 197px; }
