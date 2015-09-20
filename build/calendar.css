@@ -1,5 +1,5 @@
 .wc-calendar {
-  background: #fff; }
+  background-color: #fff; }
 
 .wc-calendar__header {
   position: relative;
@@ -71,3 +71,11 @@
 .wc-calendar__days-list__item--prev-month,
 .wc-calendar__days-list__item--next-month {
   color: gray; }
+
+.wc-calendar__days-list__item--active.wc-calendar__days-list__item--prev-month,
+.wc-calendar__days-list__item--active.wc-calendar__days-list__item--next-month {
+  border: 1px solid #4889ff;
+  background-color: #fff; }
+
+.custom-class {
+  background-color: red; }

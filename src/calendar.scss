@@ -5,7 +5,7 @@ $btn-hover-bg-color: #83AFFF;
 $main-color: #2f4f4f;
 
 .wc-calendar {
-  background: $white;
+  background-color: $white;
 }
 
   .wc-calendar__header {
@@ -81,3 +81,12 @@ $main-color: #2f4f4f;
     .wc-calendar__days-list__item--next-month {
       color: $gray;
     }
+      .wc-calendar__days-list__item--active.wc-calendar__days-list__item--prev-month,
+      .wc-calendar__days-list__item--active.wc-calendar__days-list__item--next-month {
+        border: 1px solid $btn-bg-color;
+        background-color: $white;
+      }
+
+.custom-class {
+  background-color: red;
+}

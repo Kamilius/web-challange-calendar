@@ -1,144 +1,221 @@
+/**
+ * Creates a new 'Calendar' class instance
+ * @class Calendar
+ */
 class Calendar {
+  /**
+   * @constructor
+   * @param {string} container - represents calendar container DOM query
+   * @param {string} activeDateClass - represents custom class for selected date
+   * @param {Date} initialDate - represents initially selected calendar date
+   */
   constructor({ container = '',
                 activeDateClass = '',
-                startDate = new Date()} = {}) {
-    this.container = container
-    this.$container = document.querySelector(container)
-    this.activeDateClass = activeDateClass
+                initialDate = new Date() } = {}) {
+    this.$container = container ? document.querySelector(container) : null;
+    this.activeDateClass = activeDateClass;
 
-    this.selectedDate = startDate
-    this.currentMonth = startDate
-    this.currentMonthDays = []
+    this.selectedDate = initialDate;
+    this.currentMonth = initialDate;
+    this.currentMonthDays = [];
 
-    this.monthsNames = ["January", "February", "March", "April", "May", "June",
+    // Months human readable names, to be used inside
+    // getFormattedDate() function
+    this.monthsNames = [
+      "January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"
-    ]
-
-    this.generateInitialMarkupAndBootstrap()
+    ];
+    // initizlize markup and bootstrap application events
+    this.generateMarkup();
+    this.bootstrapEvents();
   }
 
+  /**
+   * Generate selected month visible dates
+   * @function buildCurrentMonthDays
+   */
   buildCurrentMonthDays() {
     var curYear = this.currentMonth.getFullYear(),
         curMonth = this.currentMonth.getMonth(),
         firstMonthDay = new Date(curYear, curMonth, 1),
-        lastMonthDay = new Date(curYear, curMonth + 1, 0)
+        lastMonthDay = new Date(curYear, curMonth + 1, 0);
 
-    this.currentMonthDays = []
+    // clear previously selected month generated days
+    this.currentMonthDays = [];
 
+    // push visible previous month days
+    for (let i = -firstMonthDay.getUTCDay(); i < 0; i++) {
+      this.currentMonthDays.push(new Date(curYear, curMonth, i));
+    }
+
+    // push current month days
     for (let i = 1, lastDay = lastMonthDay.getDate(); i <= lastDay; i++) {
-      this.currentMonthDays.push(new Date(curYear, curMonth, i))
+      this.currentMonthDays.push(new Date(curYear, curMonth, i));
     }
 
-    for (let i = 0, daysBack = -firstMonthDay.getUTCDay(); i > daysBack; i--) {
-      this.currentMonthDays.unshift(new Date(curYear, curMonth, i))
-      console.log(`${i}   ${daysBack}`)
-    }
-
-    for (let i = 1, daysForward = 7 - lastMonthDay.getUTCDay(); i < daysForward; i++) {
-      this.currentMonthDays.push(new Date(curYear, curMonth + 1, i))
+    // push visible next month days
+    for (let i = 1, daysAppend = 7 - lastMonthDay.getUTCDay(); i < daysAppend; i++) {
+      this.currentMonthDays.push(new Date(curYear, curMonth + 1, i));
     }
   }
 
+  /**
+   * Generate 'days-list__item' element class
+   * @function getDayClass
+   * @return {string} - represents element class string
+   */
   getDayClass(date) {
-    var classes = ['wc-calendar__days-list__item']
-
-    var curYear = this.currentMonth.getFullYear(),
+    var classes = ['wc-calendar__days-list__item'],
+        curYear = this.currentMonth.getFullYear(),
         curMonth = this.currentMonth.getMonth(),
         firstMonthDay = new Date(curYear, curMonth, 1),
-        lastMonthDay = new Date(curYear, curMonth + 1, 0)
+        lastMonthDay = new Date(curYear, curMonth + 1, 0);
 
+    // if date is selectedDate
     if (date.toDateString() === this.selectedDate.toDateString()) {
-      classes = classes.concat(['wc-calendar__days-list__item--active', this.activeDateClass])
+      // add default and custom active classes
+      classes = classes.concat(['wc-calendar__days-list__item--active', this.activeDateClass]);
+    }
+    // if date is from previous year
+    if (date.getMonth() === 11 && this.currentMonth.getMonth() === 0) {
+      // mark as previous month date
+      classes.push('wc-calendar__days-list__item--prev-month');
+    // if date is from next year
+    } else if (date.getMonth() === 0 && this.currentMonth.getMonth() === 11) {
+      // mark as next month date
+      classes.push('wc-calendar__days-list__item--next-month');
+    // if date is from previous month
+    } else if (date.getMonth() < this.currentMonth.getMonth()) {
+      classes.push('wc-calendar__days-list__item--prev-month');
+    // if date is from next month
+    } else if(date.getMonth() > this.currentMonth.getMonth()) {
+      classes.push('wc-calendar__days-list__item--next-month');
     }
 
-    if (date.getMonth() < this.currentMonth.getMonth()) {
-      classes.push('wc-calendar__days-list__item--prev-month')
-    }
-
-    if (date.getMonth() > this.currentMonth.getMonth()) {
-      classes.push('wc-calendar__days-list__item--next-month')
-    }
-
-    return classes.join(' ')
+    // return element class string
+    return classes.join(' ');
   }
-
+  /**
+   * Utility function for showing formatted date of type 'MonthName YYYY'
+   * @function gerFormattedDate
+   * @param {Date} date - represents date object which shall be formatted
+   * @return {string} - represents formatted date
+   */
   getFormattedDate(date) {
-    return `${date.getFullYear()} ${this.monthsNames[date.getMonth()]}`
+    return `${date.getFullYear()} ${this.monthsNames[date.getMonth()]}`;
   }
-
+  /**
+   * Generate HTML string markup for visible calendar dates
+   * @function generateDaysMarkup
+   * @return {string} - represents HTML markup for currently selected month days
+   */
   generateDaysMarkup() {
-    var days = []
+    var days = [];
+    // build month days list
+    this.buildCurrentMonthDays();
+    // generate markup for each month day
+    this.currentMonthDays.forEach(function(day) {
+      days.push(`<li data-date="${day.toLocaleDateString()}" class="${this.getDayClass(day)}">${day.getDate()}</li>`);
+    }.bind(this));
 
-    this.buildCurrentMonthDays()
-
-    this.currentMonthDays.forEach(function(day, index) {
-      days.push(`<li data-index="${index}" class="${this.getDayClass(day)}">${day.getDate()}</li>`)
-    }.bind(this))
-
-    return days.join('')
+    return days.join('');
   }
-
+  /**
+   * Refresh calendar view
+   * @function refreshCalendar
+   */
   refreshCalendar() {
-    this.$container.querySelector('.wc-calendar__days-list').innerHTML = this.generateDaysMarkup()
-    this.$container.querySelector('.wc-calendar__header__date').innerHTML = this.getFormattedDate(this.currentMonth)
+    // refresh days-list
+    this.$container.querySelector('.wc-calendar__days-list').innerHTML = this.generateDaysMarkup();
+    // refresh calendar header date
+    this.$container.querySelector('.wc-calendar__header__date').innerHTML = this.getFormattedDate(this.currentMonth);
   }
-
+  /**
+   * Switch calendar to previous month
+   * @function prevMonth
+   */
   prevMonth() {
     var curYear = this.currentMonth.getFullYear(),
-        curMonth = this.currentMonth.getMonth()
-
-    this.currentMonth = new Date(curYear, curMonth - 1, 1)
-
-    this.refreshCalendar()
+        curMonth = this.currentMonth.getMonth();
+    // set currentMonth to month before
+    this.currentMonth = new Date(curYear, curMonth - 1, 1);
+    // refresh calendar view
+    this.refreshCalendar();
   }
-
+  /**
+   * Switch calendar to next month
+   * @function nextMonth
+   */
   nextMonth() {
     var curYear = this.currentMonth.getFullYear(),
-        curMonth = this.currentMonth.getMonth()
-
-    this.currentMonth = new Date(curYear, curMonth + 1, 1)
-
-    this.refreshCalendar()
+        curMonth = this.currentMonth.getMonth();
+    // set currentMonth to month after
+    this.currentMonth = new Date(curYear, curMonth + 1, 1);
+    // refresh calendar view
+    this.refreshCalendar();
   }
-
-  getDayIndexByDate(date) {
-    for (let i = 0; i < this.currentMonthDays.length; i++) {
-      if (this.currentMonthDays[i].toDateString() === date.toDateString()) {
-        return i
-      }
-    }
-    return -1
-  }
-
+  /**
+   * Select day. Used as event handler for day-list__item 'click'
+   * @function selectDay
+   * @prop {Object} event - represents 'click' event object
+   */
   selectDay(event) {
-    var $target = event.target
-
+    var $target = event.target;
+    // Act only if 'day-list__item' was clicked
     if ($target.classList.contains('wc-calendar__days-list__item')) {
-      let $activeItem = this.$container.querySelector('.wc-calendar__days-list__item--active')
-      this.selectedDate = this.currentMonthDays[$target.dataset.index]
+      let isPrevMonth = $target.classList.contains('wc-calendar__days-list__item--prev-month'),
+          isNextMonth = $target.classList.contains('wc-calendar__days-list__item--next-month');
 
-      if ($activeItem) {
-        $activeItem.classList.remove('wc-calendar__days-list__item--active')
-      }
+      this.selectedDate = new Date($target.dataset.date);
 
-      if ($target.classList.contains('wc-calendar__days-list__item--prev-month')
-          || $target.classList.contains('wc-calendar__days-list__item--next-month')) {
-        if ($target.classList.contains('wc-calendar__days-list__item--prev-month')) {
-          this.prevMonth()
+      // if element represents date from either previous or next month
+      if (isPrevMonth || isNextMonth) {
+        // if previous month
+        if (isPrevMonth) {
+          // switch calendar to month before
+          this.prevMonth();
+        // if next
+        } else {
+          // switch calendar to month after
+          this.nextMonth();
         }
-
-        if ($target.classList.contains('wc-calendar__days-list__item--next-month')) {
-          this.nextMonth()
+        // select date element from currently rendered month
+        $target = this.$container.querySelector(`[data-date="${this.selectedDate.toLocaleDateString()}"]`);
+      // if element represents currently rendered month
+      } else {
+        let $activeItem = this.$container.querySelector('.wc-calendar__days-list__item--active');
+        // if there already is element with active class
+        if ($activeItem) {
+          // remove active class from element
+          $activeItem.classList.remove('wc-calendar__days-list__item--active');
+          // if custom active class was specified - remove this class
+          this.activeDateClass && $activeItem.classList.remove(this.activeDateClass);
         }
-
-        $target = this.$container.querySelector(`[data-index=${this.getDayIndexByDate(this.selectedDate)}]`)
       }
-
-      $target.classList.add('wc-calendar__days-list__item--active')
+      // add default and custom active classes to selected date element
+      $target.classList.add('wc-calendar__days-list__item--active');
+      this.activeDateClass && $target.classList.add(this.activeDateClass);
     }
   }
-
-  generateInitialMarkupAndBootstrap() {
+  /**
+   * Generate initial calendar markup
+   * @function generateMarkup
+   */
+  generateMarkup() {
+    // if container query wasn't specified
+    if (!this.$container) {
+      // create new container element
+      let fragment = document.createDocumentFragment(),
+          calendarContainer = document.createElement('div');
+      fragment.appendChild(calendarContainer);
+      // append container to body
+      document.body.appendChild(calendarContainer);
+      // save new container reference
+      this.$container = calendarContainer;
+    }
+    // add default class for container
+    this.$container.classList.add('wc-calendar');
+    // form calendar markup
     this.$container.innerHTML = `
 <div class="wc-calendar__header">
   <button class="wc-calendar__btn wc-calendar__btn--prev">Prev</button>
@@ -159,12 +236,21 @@ class Calendar {
     ${this.generateDaysMarkup()}
   </ul>
 </div>
-`
+`;
+  }
+  /**
+   * Bootstrap calendar specific events
+   * @function bootstrapEvents
+   */
+  bootstrapEvents() {
+    // prev month button event handler
     this.$container.querySelector('.wc-calendar__btn--prev')
-                .addEventListener('click', this.prevMonth.bind(this))
+                .addEventListener('click', this.prevMonth.bind(this));
+    // next month button event handler
     this.$container.querySelector('.wc-calendar__btn--next')
-                .addEventListener('click', this.nextMonth.bind(this))
+                .addEventListener('click', this.nextMonth.bind(this));
+    // select day item delegated to days-list event handler
     this.$container.querySelector('.wc-calendar__days-list')
-                .addEventListener('click', this.selectDay.bind(this))
+                .addEventListener('click', this.selectDay.bind(this));
   }
 }
